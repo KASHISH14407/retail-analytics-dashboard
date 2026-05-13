@@ -1,0 +1,57 @@
+# ============================================================
+# Sales Analysis Project - Requirements
+# Tools: Python, SQL (SQLite), Excel, Power BI
+# Level: Intermediate Data Analyst
+# ============================================================
+
+# ── Core Data Analysis ──────────────────────────────────────
+pandas==3.0.2               # Data manipulation and analysis
+numpy>=1.26.0               # Numerical computing
+
+# ── Data Visualization ──────────────────────────────────────
+matplotlib==3.10.8          # Plotting and charting
+seaborn==0.13.2             # Statistical data visualization
+
+# ── Excel / File Handling ───────────────────────────────────
+openpyxl==3.1.5             # Read/write Excel .xlsx files
+
+# ── Database ────────────────────────────────────────────────
+# sqlite3 is built into Python standard library — no install needed
+
+# ── Utilities ───────────────────────────────────────────────
+warnings                    # Built-in Python module — no install needed
+
+# ============================================================
+# HOW TO INSTALL
+# ============================================================
+# Run this command in your terminal:
+#
+#   pip install -r requirements.txt
+#
+# Or install individually:
+#   pip install pandas==3.0.2
+#   pip install matplotlib==3.10.8
+#   pip install seaborn==0.13.2
+#   pip install openpyxl==3.1.5
+#
+# ============================================================
+# PYTHON VERSION
+# ============================================================
+# Recommended: Python 3.10 or higher
+# Tested on:   Python 3.12
+#
+# ============================================================
+# POWER BI (separate tool — not a Python package)
+# ============================================================
+# Download Power BI Desktop (free):
+#   https://powerbi.microsoft.com/en-us/desktop/
+#
+# ============================================================
+# PROJECT FILES
+# ============================================================
+# sales_analysis.py      → Main Python script
+# sales_data.xlsx        → Generated Excel output (5 sheets)
+# sales_dashboard.png    → Static dashboard (6 charts)
+# powerbi_guide.docx     → Step-by-step Power BI guide
+# requirements.txt       → This file
+# ============================================================
