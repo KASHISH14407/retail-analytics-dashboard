@@ -146,19 +146,6 @@ The exported `sales_data.xlsx` is structured for direct import into Power BI:
 4. Create relationships between sheets on `category` and `region` fields
 5. Build visuals — bar chart for regions, line chart for monthly trend, pie for quarters
 
----
-
-## 🌱 Future Improvements
-
-- [ ] Add sales forecasting with `scikit-learn`
-- [ ] Connect to PostgreSQL or MySQL database
-- [ ] Build interactive web dashboard with Streamlit or Dash
-- [ ] Pull real data from Kaggle datasets
-- [ ] Containerize with Docker
-- [ ] Add unit tests with `pytest`
-- [ ] Schedule automated reports with GitHub Actions
-
----
 
 ## 📄 License
 
