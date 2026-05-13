@@ -1,0 +1,323 @@
+
+<h2 class="sr-only">Interactive sales analysis dashboard 2023 — filter by region and category, switch chart types, view KPIs update live</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.db{padding:1rem 0}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;letter-spacing:.02em}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center}
+.pill{font-size:12px;padding:5px 13px;border-radius:20px;border:0.5px solid var(--color-border-secondary);cursor:pointer;transition:background .15s,color .15s;color:var(--color-text-secondary);background:transparent;font-family:inherit}
+.pill.active{background:#7F77DD;color:#fff;border-color:#7F77DD}
+.pill:hover:not(.active){background:var(--color-background-secondary)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.25rem}
+.kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px;transition:background .2s}
+.kpi-lbl{font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.kpi-val{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.kpi-delta{font-size:11px;margin-top:3px}
+.up{color:#1D9E75}.dn{color:#E24B4A}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.chart-row.full{grid-template-columns:1fr}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px}
+.card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.card-ttl{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em}
+.toggle-grp{display:flex;border:0.5px solid var(--color-border-secondary);border-radius:6px;overflow:hidden}
+.tgl{font-size:11px;padding:3px 8px;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);font-family:inherit}
+.tgl.on{background:#534AB7;color:#fff}
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.leg span{font-size:11px;color:var(--color-text-secondary);display:flex;align-items:center;gap:4px}
+.dot{width:8px;height:8px;border-radius:2px;display:inline-block}
+.insight-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.ins{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;border-left:3px solid #7F77DD;border-radius:0;border-radius:var(--border-radius-md)}
+.ins.teal{border-left-color:#1D9E75}
+.ins.coral{border-left-color:#D85A30}
+.ins-lbl{font-size:10px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.ins-val{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+</style>
+
+<div class="db">
+<div class="topbar">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:17px;font-weight:500;color:var(--color-text-primary)">Sales dashboard</span>
+    <span style="font-size:12px;color:var(--color-text-secondary)">FY 2023</span>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span class="badge" style="background:#EEEDFE;color:#3C3489">1,000 orders</span>
+    <button class="pill active" id="btn-insight" onclick="sendPrompt('Give me 3 key business insights from this sales dashboard')">Ask AI insights ↗</button>
+  </div>
+</div>
+
+<div class="filters">
+  <span style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-right:4px">Region</span>
+  <button class="pill active" onclick="setRegion('All',this)">All</button>
+  <button class="pill" onclick="setRegion('North',this)">North</button>
+  <button class="pill" onclick="setRegion('South',this)">South</button>
+  <button class="pill" onclick="setRegion('East',this)">East</button>
+  <button class="pill" onclick="setRegion('West',this)">West</button>
+  <span style="font-size:11px;color:var(--color-border-secondary);margin:0 4px">|</span>
+  <span style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-right:4px">Category</span>
+  <button class="pill active" onclick="setCat('All',this)">All</button>
+  <button class="pill" onclick="setCat('Electronics',this)">Electronics</button>
+  <button class="pill" onclick="setCat('Clothing',this)">Clothing</button>
+  <button class="pill" onclick="setCat('Furniture',this)">Furniture</button>
+  <button class="pill" onclick="setCat('Food',this)">Food</button>
+  <button class="pill" onclick="setCat('Sports',this)">Sports</button>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="kpi-lbl">Total revenue</div><div class="kpi-val" id="k-rev">$2.12M</div><div class="kpi-delta up">↑ all regions</div></div>
+  <div class="kpi"><div class="kpi-lbl">Total profit</div><div class="kpi-val" id="k-prf">$531K</div><div class="kpi-delta up">↑ healthy margin</div></div>
+  <div class="kpi"><div class="kpi-lbl">Avg margin</div><div class="kpi-val" id="k-mgn">25.0%</div><div class="kpi-delta" style="color:var(--color-text-secondary)">across categories</div></div>
+  <div class="kpi"><div class="kpi-lbl">Orders</div><div class="kpi-val" id="k-ord">1,000</div><div class="kpi-delta" style="color:var(--color-text-secondary)">total FY2023</div></div>
+</div>
+
+<div class="insight-row">
+  <div class="ins"><div class="ins-lbl">Best region</div><div class="ins-val" id="i-reg">North · $568K</div></div>
+  <div class="ins teal"><div class="ins-lbl">Top product</div><div class="ins-val" id="i-prod">Table · $133K</div></div>
+  <div class="ins coral"><div class="ins-lbl">Peak month</div><div class="ins-val" id="i-month">March · $225K</div></div>
+</div>
+
+<div class="chart-row">
+  <div class="card">
+    <div class="card-hdr">
+      <span class="card-ttl">Revenue by region</span>
+      <div class="toggle-grp">
+        <button class="tgl on" id="t-reg-bar" onclick="switchRegChart('bar',this)">Bar</button>
+        <button class="tgl" id="t-reg-pie" onclick="switchRegChart('doughnut',this)">Donut</button>
+      </div>
+    </div>
+    <div style="position:relative;height:200px"><canvas id="c-reg" role="img" aria-label="Revenue by region bar chart">North $568K, South $555K, East $518K, West $476K</canvas></div>
+    <div class="leg" id="leg-reg">
+      <span><span class="dot" style="background:#7F77DD"></span>North $568K</span>
+      <span><span class="dot" style="background:#1D9E75"></span>South $555K</span>
+      <span><span class="dot" style="background:#D85A30"></span>East $518K</span>
+      <span><span class="dot" style="background:#D4537E"></span>West $476K</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">
+      <span class="card-ttl">Monthly trend</span>
+      <div class="toggle-grp">
+        <button class="tgl on" id="t-mon-line" onclick="switchMonChart('line',this)">Line</button>
+        <button class="tgl" id="t-mon-bar" onclick="switchMonChart('bar',this)">Bar</button>
+      </div>
+    </div>
+    <div style="position:relative;height:200px"><canvas id="c-mon" role="img" aria-label="Monthly revenue trend line chart Jan to Dec 2023">Revenue peaks March and August.</canvas></div>
+  </div>
+</div>
+
+<div class="chart-row">
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl">Category revenue</span></div>
+    <div style="position:relative;height:220px"><canvas id="c-cat" role="img" aria-label="Horizontal bar chart of revenue by category">Clothing leads all categories.</canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl">Profit margin % by category</span></div>
+    <div style="position:relative;height:220px"><canvas id="c-mgn" role="img" aria-label="Bar chart of profit margins by category">Food highest at 25.3%.</canvas></div>
+  </div>
+</div>
+
+<div class="chart-row">
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl">Quarterly revenue share</span></div>
+    <div style="position:relative;height:200px"><canvas id="c-qtr" role="img" aria-label="Donut chart quarterly revenue: Q4 leads at 26.3%">Q4 26.3%, Q3 25.5%, Q1 24.1%, Q2 24%</canvas></div>
+    <div class="leg" style="justify-content:center;margin-top:8px">
+      <span><span class="dot" style="background:#7F77DD"></span>Q1 24.1%</span>
+      <span><span class="dot" style="background:#1D9E75"></span>Q2 24.0%</span>
+      <span><span class="dot" style="background:#D85A30"></span>Q3 25.5%</span>
+      <span><span class="dot" style="background:#D4537E"></span>Q4 26.3%</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-ttl">Top 5 products</span></div>
+    <div style="position:relative;height:200px"><canvas id="c-top" role="img" aria-label="Bar chart top 5 products by revenue">Table leads at $133K.</canvas></div>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const PALETTE = ['#7F77DD','#1D9E75','#D85A30','#D4537E','#BA7517','#378ADD'];
+const gridC = 'rgba(128,128,128,0.08)';
+const tickC = '#888';
+const fmtK = v => '$'+(v>=1000000?(v/1000000).toFixed(2)+'M':v>=1000?(v/1000).toFixed(0)+'K':v);
+
+const RAW = {
+  All:{
+    region:{labels:['North','South','East','West'],data:[568706,554979,518161,475713]},
+    monthly:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],data:[130000,152000,225000,180000,162000,155000,153000,220000,163000,162000,216000,178000]},
+    cat:{labels:['Clothing','Electronics','Food','Sports','Furniture'],data:[425000,410000,400000,390000,380000]},
+    mgn:{labels:['Clothing','Electronics','Food','Sports','Furniture'],data:[25.1,24.7,25.3,24.9,24.5]},
+    top:{labels:['Table','Gym Kit','Jacket','Headphones','Jeans'],data:[133000,132000,130000,123000,122000]},
+    kpi:{rev:2117559,prf:531000,mgn:25.0,ord:1000},
+    ins:{reg:'North · $568K',prod:'Table · $133K',month:'March · $225K'}
+  },
+  North:{
+    region:{labels:['North'],data:[568706]},
+    monthly:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],data:[33000,38000,60000,45000,40000,39000,38000,56000,41000,41000,55000,45000]},
+    cat:{labels:['Clothing','Electronics','Food','Sports','Furniture'],data:[118000,114000,108000,102000,98000]},
+    mgn:{labels:['Clothing','Electronics','Food','Sports','Furniture'],data:[25.4,24.9,25.6,25.1,24.7]},
+    top:{labels:['Table','Gym Kit','Jacket','Headphones','Jeans'],data:[34000,33000,33000,31000,31000]},
+    kpi:{rev:568706,prf:142000,mgn:25.4,ord:252},
+    ins:{reg:'North · $568K',prod:'Table · $34K',month:'March · $60K'}
+  },
+  South:{
+    region:{labels:['South'],data:[554979]},
+    monthly:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],data:[32000,37000,55000,44000,40000,38000,37000,55000,40000,40000,53000,44000]},
+    cat:{labels:['Clothing','Electronics','Food','Sports','Furniture'],data:[115000,112000,106000,99000,95000]},
+    mgn:{labels:['Clothing','Electronics','Food','Sports','Furniture'],data:[25.0,24.6,25.1,24.7,24.3]},
+    top:{labels:['Table','Jacket','Gym Kit','Headphones','Jeans'],data:[33000,32000,32000,30000,30000]},
+    kpi:{rev:554979,prf:138000,mgn:25.0,ord:246},
+    ins:{reg:'South · $555K',prod:'Table · $33K',month:'March · $55K'}
+  },
+  East:{
+    region:{labels:['East'],data:[518161]},
+    monthly:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],data:[30000,34000,54000,41000,38000,36000,35000,52000,38000,38000,52000,41000]},
+    cat:{labels:['Clothing','Electronics','Food','Sports','Furniture'],data:[107000,105000,98000,95000,92000]},
+    mgn:{labels:['Clothing','Electronics','Food','Sports','Furniture'],data:[25.2,24.8,25.4,24.9,24.5]},
+    top:{labels:['Gym Kit','Table','Jacket','Headphones','Jeans'],data:[31000,30000,30000,29000,28000]},
+    kpi:{rev:518161,prf:129000,mgn:25.2,ord:230},
+    ins:{reg:'East · $518K',prod:'Gym Kit · $31K',month:'March · $54K'}
+  },
+  West:{
+    region:{labels:['West'],data:[475713]},
+    monthly:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],data:[28000,31000,48000,38000,35000,33000,32000,48000,35000,35000,47000,38000]},
+    cat:{labels:['Clothing','Electronics','Food','Sports','Furniture'],data:[98000,95000,90000,88000,85000]},
+    mgn:{labels:['Clothing','Electronics','Food','Sports','Furniture'],data:[24.9,24.5,25.0,24.6,24.2]},
+    top:{labels:['Table','Jacket','Gym Kit','Jeans','Headphones'],data:[30000,29000,29000,28000,27000]},
+    kpi:{rev:475713,prf:119000,mgn:24.9,ord:211},
+    ins:{reg:'West · $476K',prod:'Table · $30K',month:'March · $48K'}
+  }
+};
+
+let curRegion = 'All', curCat = 'All';
+
+function getData(){
+  let d = JSON.parse(JSON.stringify(RAW[curRegion]));
+  if(curCat !== 'All'){
+    const ci = d.cat.labels.indexOf(curCat);
+    if(ci>=0){
+      d.cat = {labels:[curCat],data:[d.cat.data[ci]]};
+      d.mgn = {labels:[curCat],data:[d.mgn.data[ci]]};
+    }
+    const pi = d.top.labels.findIndex(l=>l===curCat);
+  }
+  return d;
+}
+
+function updateKPIs(d){
+  document.getElementById('k-rev').textContent = fmtK(d.kpi.rev);
+  document.getElementById('k-prf').textContent = fmtK(d.kpi.prf);
+  document.getElementById('k-mgn').textContent = d.kpi.mgn.toFixed(1)+'%';
+  document.getElementById('k-ord').textContent = d.kpi.ord.toLocaleString();
+  document.getElementById('i-reg').textContent = d.ins.reg;
+  document.getElementById('i-prod').textContent = d.ins.prod;
+  document.getElementById('i-month').textContent = d.ins.month;
+}
+
+const opts = (extra={}) => ({responsive:true,maintainAspectRatio:false,animation:{duration:500},plugins:{legend:{display:false},...(extra.plugins||{})},scales:{...extra.scales},...(extra.other||{})});
+
+let regChart, monChart, catChart, mgnChart, qtrChart, topChart;
+let regType = 'bar', monType = 'line';
+
+function makeReg(d){
+  if(regChart) regChart.destroy();
+  const colors = d.region.labels.map((_,i)=>PALETTE[i%PALETTE.length]);
+  regChart = new Chart(document.getElementById('c-reg'),{
+    type:regType,
+    data:{labels:d.region.labels,datasets:[{data:d.region.data,backgroundColor:colors,borderRadius:regType==='bar'?4:0,borderWidth:regType==='doughnut'?2:0,borderColor:'transparent',hoverOffset:6}]},
+    options:{...opts({scales:regType==='bar'?{x:{grid:{display:false},ticks:{color:tickC,font:{size:11}}},y:{grid:{color:gridC},ticks:{color:tickC,font:{size:10},callback:v=>fmtK(v)}}}:{},other:{cutout:regType==='doughnut'?'58%':undefined}})}
+  });
+}
+
+function makeMon(d){
+  if(monChart) monChart.destroy();
+  monChart = new Chart(document.getElementById('c-mon'),{
+    type:monType,
+    data:{labels:d.monthly.labels,datasets:[{data:d.monthly.data,borderColor:'#7F77DD',backgroundColor:monType==='line'?'rgba(127,119,221,0.1)':'#7F77DD',borderWidth:monType==='line'?2:undefined,pointRadius:monType==='line'?4:undefined,pointBackgroundColor:'#7F77DD',tension:0.35,fill:monType==='line',borderRadius:monType==='bar'?4:undefined,borderSkipped:false}]},
+    options:opts({scales:{x:{grid:{display:false},ticks:{color:tickC,font:{size:10},autoSkip:false,maxRotation:45}},y:{grid:{color:gridC},ticks:{color:tickC,font:{size:10},callback:v=>fmtK(v)}}}})
+  });
+}
+
+function makeCat(d){
+  if(catChart) catChart.destroy();
+  const colors = d.cat.labels.map((_,i)=>PALETTE[i%PALETTE.length]);
+  catChart = new Chart(document.getElementById('c-cat'),{
+    type:'bar',
+    data:{labels:d.cat.labels,datasets:[{data:d.cat.data,backgroundColor:colors,borderRadius:3,borderSkipped:false}]},
+    options:{...opts({scales:{x:{grid:{color:gridC},ticks:{color:tickC,font:{size:10},callback:v=>fmtK(v)}},y:{grid:{display:false},ticks:{color:tickC,font:{size:11}}}}}),indexAxis:'y'}
+  });
+}
+
+function makeMgn(d){
+  if(mgnChart) mgnChart.destroy();
+  const colors = d.mgn.labels.map((_,i)=>PALETTE[i%PALETTE.length]);
+  mgnChart = new Chart(document.getElementById('c-mgn'),{
+    type:'bar',
+    data:{labels:d.mgn.labels,datasets:[{data:d.mgn.data,backgroundColor:colors,borderRadius:4,borderSkipped:false}]},
+    options:opts({scales:{x:{grid:{display:false},ticks:{color:tickC,font:{size:10}}},y:{min:23,max:27,grid:{color:gridC},ticks:{color:tickC,font:{size:10},callback:v=>v+'%'}}}})
+  });
+}
+
+function makeQtr(){
+  if(qtrChart) return;
+  qtrChart = new Chart(document.getElementById('c-qtr'),{
+    type:'doughnut',
+    data:{labels:['Q1','Q2','Q3','Q4'],datasets:[{data:[24.1,24.0,25.5,26.3],backgroundColor:PALETTE.slice(0,4),borderWidth:2,borderColor:'transparent',hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',animation:{duration:500},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+c.raw+'%'}}}}
+  });
+}
+
+function makeTop(d){
+  if(topChart) topChart.destroy();
+  topChart = new Chart(document.getElementById('c-top'),{
+    type:'bar',
+    data:{labels:d.top.labels,datasets:[{data:d.top.data,backgroundColor:PALETTE,borderRadius:4,borderSkipped:false}]},
+    options:opts({scales:{x:{grid:{display:false},ticks:{color:tickC,font:{size:10},maxRotation:20}},y:{grid:{color:gridC},ticks:{color:tickC,font:{size:10},callback:v=>fmtK(v)}}}})
+  });
+}
+
+function renderAll(){
+  const d = getData();
+  updateKPIs(d);
+  makeReg(d); makeMon(d); makeCat(d); makeMgn(d); makeQtr(); makeTop(d);
+}
+
+function setRegion(r,el){
+  curRegion = r;
+  document.querySelectorAll('.filters .pill').forEach(b=>{
+    if(['All','North','South','East','West'].includes(b.textContent)) b.classList.remove('active');
+  });
+  el.classList.add('active');
+  renderAll();
+}
+
+function setCat(c,el){
+  curCat = c;
+  const cats = ['All','Electronics','Clothing','Furniture','Food','Sports'];
+  document.querySelectorAll('.filters .pill').forEach(b=>{
+    if(cats.includes(b.textContent)) b.classList.remove('active');
+  });
+  el.classList.add('active');
+  renderAll();
+}
+
+function switchRegChart(type,el){
+  regType = type;
+  document.querySelectorAll('#t-reg-bar,#t-reg-pie').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  const d = getData();
+  makeReg(d);
+}
+
+function switchMonChart(type,el){
+  monType = type;
+  document.querySelectorAll('#t-mon-line,#t-mon-bar').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  const d = getData();
+  makeMon(d);
+}
+
+renderAll();
+</script>
