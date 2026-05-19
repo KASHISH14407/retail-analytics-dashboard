@@ -2,10 +2,6 @@
 
 > Analyzes 1,000 sales transactions across 4 regions, 5 categories & 10 sales reps using Python and SQL. Outputs a 6-panel Matplotlib dashboard and a Power BI-ready Excel file with multi-sheet summaries.
 
-![Sales Dashboard](sales_dashboard.png)
-
----
-
 ## 🎯 Project Overview
 
 A complete end-to-end sales data analysis project built entirely in Python. This project simulates a real-world business intelligence workflow — starting from raw data generation, moving through data cleaning and SQL-based analysis, and finishing with a fully visualized multi-panel dashboard and a Power BI-ready Excel export.
