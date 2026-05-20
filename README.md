@@ -154,6 +154,4 @@ This project is licensed under the MIT License — feel free to use, modify, and
 **Kashish**
 - GitHub: [@KASHISH14407](https://github.com/KASHISH14407)
 
----
 
-> *"Without data you're just another person with an opinion."* — W. Edwards Deming
