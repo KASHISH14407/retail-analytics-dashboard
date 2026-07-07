@@ -1,0 +1,95 @@
+
+<h2 class="sr-only">Sales Analysis Dashboard 2023 — interactive charts showing revenue by region, monthly trends, category performance, profit margins, quarterly breakdown, and top products</h2>
+
+<style>
+.dash-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:12px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.5rem}
+.kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.kpi-label{font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.kpi-val{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.kpi-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.chart-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px}
+.chart-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:12px;text-transform:uppercase;letter-spacing:.04em}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11px;color:var(--color-text-secondary)}
+.legend-dot{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:4px}
+@media(max-width:520px){.chart-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="dash-header">
+  <div>
+    <span style="font-size:18px;font-weight:500;color:var(--color-text-primary)">Sales analysis dashboard</span>
+    <span style="font-size:13px;color:var(--color-text-secondary);margin-left:10px">FY 2023</span>
+  </div>
+  <span style="font-size:12px;color:var(--color-text-tertiary);background:var(--color-background-secondary);padding:4px 10px;border-radius:var(--border-radius-md)">1,000 orders</span>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-label">Total revenue</div><div class="kpi-val">$2.12M</div><div class="kpi-sub">All regions</div></div>
+  <div class="kpi"><div class="kpi-label">Best region</div><div class="kpi-val">North</div><div class="kpi-sub">$568,706</div></div>
+  <div class="kpi"><div class="kpi-label">Best product</div><div class="kpi-val">Table</div><div class="kpi-sub">$133K revenue</div></div>
+  <div class="kpi"><div class="kpi-label">Avg margin</div><div class="kpi-val">25.0%</div><div class="kpi-sub">Across categories</div></div>
+</div>
+
+<div class="chart-grid">
+  <div class="chart-card">
+    <div class="chart-title">Revenue by region</div>
+    <div style="position:relative;height:200px"><canvas id="c1" role="img" aria-label="Bar chart: North $568K, South $555K, East $518K, West $476K">North leads at $568K revenue.</canvas></div>
+    <div class="legend">
+      <span><span class="legend-dot" style="background:#3266ad"></span>North</span>
+      <span><span class="legend-dot" style="background:#e07b42"></span>South</span>
+      <span><span class="legend-dot" style="background:#6aab6a"></span>East</span>
+      <span><span class="legend-dot" style="background:#c95b5b"></span>West</span>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Monthly revenue trend</div>
+    <div style="position:relative;height:200px"><canvas id="c2" role="img" aria-label="Line chart of monthly revenue Jan–Dec 2023, peaks in March and August">Revenue peaks in March and August.</canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Revenue by category</div>
+    <div style="position:relative;height:220px"><canvas id="c3" role="img" aria-label="Horizontal bar chart: Clothing leads, then Electronics, Food, Sports, Furniture">Clothing has highest revenue.</canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Profit margin % by category</div>
+    <div style="position:relative;height:220px"><canvas id="c4" role="img" aria-label="Bar chart of profit margins: Furniture 24.5%, Sports 24.9%, Food 25.3%, Electronics 24.7%, Clothing 25.1%">Food has highest margin at 25.3%.</canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Revenue share by quarter</div>
+    <div style="position:relative;height:220px"><canvas id="c5" role="img" aria-label="Donut chart: Q4 26.3%, Q3 25.5%, Q1 24.1%, Q2 24%">Q4 leads with 26.3% share.</canvas></div>
+    <div class="legend" style="justify-content:center">
+      <span><span class="legend-dot" style="background:#5c85c8"></span>Q1 24.1%</span>
+      <span><span class="legend-dot" style="background:#a8c97f"></span>Q2 24.0%</span>
+      <span><span class="legend-dot" style="background:#e6c96b"></span>Q3 25.5%</span>
+      <span><span class="legend-dot" style="background:#e07b7b"></span>Q4 26.3%</span>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Top 5 products by revenue</div>
+    <div style="position:relative;height:220px"><canvas id="c6" role="img" aria-label="Bar chart: Table $133K, Gym Kit $132K, Jacket $130K, Headphones $123K, Jeans $122K">Table leads at $133K.</canvas></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const gridColor = 'rgba(128,128,128,0.08)';
+const tickColor = '#888';
+const fmt = v => '$' + (v>=1000?(v/1000).toFixed(0)+'K':v);
+
+new Chart(document.getElementById('c1'),{type:'bar',data:{labels:['North','South','East','West'],datasets:[{data:[568706,554979,518161,475713],backgroundColor:['#3266ad','#e07b42','#6aab6a','#c95b5b'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.raw.toLocaleString()}}},scales:{x:{grid:{display:false},ticks:{color:tickColor,font:{size:11}}},y:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+
+new Chart(document.getElementById('c2'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[{data:[130000,152000,225000,180000,162000,155000,153000,220000,163000,162000,216000,178000],borderColor:'#1d9e75',backgroundColor:'rgba(29,158,117,0.08)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#1d9e75',tension:0.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.raw.toLocaleString()}}},scales:{x:{grid:{display:false},ticks:{color:tickColor,font:{size:10}}},y:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+
+new Chart(document.getElementById('c3'),{type:'bar',data:{labels:['Clothing','Electronics','Food','Sports','Furniture'],datasets:[{data:[425000,410000,400000,390000,380000],backgroundColor:['#c95b5b','#e07b42','#9e9e9e','#5c85c8','#6aab6a'],borderRadius:3,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.raw.toLocaleString()}}},scales:{x:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'K'}},y:{grid:{display:false},ticks:{color:tickColor,font:{size:11}}}}}});
+
+new Chart(document.getElementById('c4'),{type:'bar',data:{labels:['Furniture','Sports','Food','Electronics','Clothing'],datasets:[{data:[24.5,24.9,25.3,24.7,25.1],backgroundColor:['#3d3d8f','#2d7d9a','#1d9e75','#5c85c8','#6aab6a'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'%'}}},scales:{x:{grid:{display:false},ticks:{color:tickColor,font:{size:10}}},y:{min:23,max:26,grid:{color:gridColor},ticks:{color:tickColor,font:{size:10},callback:v=>v+'%'}}}}});
+
+new Chart(document.getElementById('c5'),{type:'doughnut',data:{labels:['Q1','Q2','Q3','Q4'],datasets:[{data:[24.1,24.0,25.5,26.3],backgroundColor:['#5c85c8','#a8c97f','#e6c96b','#e07b7b'],borderWidth:2,borderColor:'transparent',hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+c.raw+'%'}}}}});
+
+new Chart(document.getElementById('c6'),{type:'bar',data:{labels:['Table','Gym Kit','Jacket','Headphones','Jeans'],datasets:[{data:[133000,132000,130000,123000,122000],backgroundColor:['#3266ad','#e07b42','#6aab6a','#c95b5b','#9b6bb5'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.raw.toLocaleString()}}},scales:{x:{grid:{display:false},ticks:{color:tickColor,font:{size:10},maxRotation:20}},y:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+</script>
